@@ -17,6 +17,7 @@ public class ReviewDTO {
     private LocalDateTime updatedAt;
 
     private String nickname;
+    private String restaurantName;
 
     public int getReviewId() {
         return reviewId;
@@ -80,5 +81,13 @@ public class ReviewDTO {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public String getRestaurantName() {
+        return restaurantName;
+    }
+
+    public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
     }
 }

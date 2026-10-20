@@ -99,4 +99,57 @@ public class ReviewDAO {
         }
         return reviewList;
     }
+
+    /** 내가 쓴 리뷰를 최신순으로 조회한다. 가게 이름은 restaurant 와 JOIN 해서 가져온다. */
+    public List<ReviewDTO> findByMember(int memberId) throws SQLException {
+        String sql = "SELECT v.review_id, v.restaurant_id, v.member_id, v.rating, v.content, "
+                + "v.created_at, v.updated_at, r.name AS restaurant_name "
+                + "FROM review v JOIN restaurant r ON v.restaurant_id = r.restaurant_id "
+                + "WHERE v.member_id = ? "
+                + "ORDER BY v.created_at DESC, v.review_id DESC";
+        List<ReviewDTO> reviewList = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, memberId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    ReviewDTO review = new ReviewDTO();
+                    review.setReviewId(rs.getInt("review_id"));
+                    review.setRestaurantId(rs.getInt("restaurant_id"));
+                    review.setMemberId(rs.getInt("member_id"));
+                    review.setRating(rs.getInt("rating"));
+                    review.setContent(rs.getString("content"));
+                    review.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                    review.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+                    review.setRestaurantName(rs.getString("restaurant_name"));
+                    reviewList.add(review);
+                }
+            }
+        }
+        return reviewList;
+    }
+
+    /** 내 리뷰의 별점·내용을 수정한다. 반영된 행 수를 반환한다. (남의 리뷰면 0) */
+    public int update(int reviewId, int memberId, int rating, String content) throws SQLException {
+        String sql = "UPDATE review SET rating = ?, content = ? WHERE review_id = ? AND member_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, rating);
+            pstmt.setString(2, content);
+            pstmt.setInt(3, reviewId);
+            pstmt.setInt(4, memberId);
+            return pstmt.executeUpdate();
+        }
+    }
+
+    /** 내 리뷰를 삭제한다. 삭제된 행 수를 반환한다. (남의 리뷰면 0) */
+    public int delete(int reviewId, int memberId) throws SQLException {
+        String sql = "DELETE FROM review WHERE review_id = ? AND member_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, reviewId);
+            pstmt.setInt(2, memberId);
+            return pstmt.executeUpdate();
+        }
+    }
 }
