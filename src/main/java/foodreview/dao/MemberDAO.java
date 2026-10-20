@@ -25,6 +25,24 @@ public class MemberDAO {
         }
     }
 
+    /** 로그인 성공 시 회원 정보, 실패하면 null. 탈퇴한 회원은 로그인할 수 없다. (F-02) */
+    public LoginResult login(String loginId, String password) throws SQLException {
+        String sql = "SELECT member_id, nickname FROM member"
+                + " WHERE login_id = ? AND password_hash = ? AND withdrawn_at IS NULL";
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, loginId);
+            pstmt.setString(2, password);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next()
+                        ? new LoginResult(rs.getInt("member_id"), rs.getString("nickname"))
+                        : null;
+            }
+        }
+    }
+
+    public record LoginResult(int memberId, String nickname) { }
+
     public boolean existsLoginId(String loginId) throws SQLException {
         return exists("SELECT 1 FROM member WHERE login_id = ?", loginId);
     }
