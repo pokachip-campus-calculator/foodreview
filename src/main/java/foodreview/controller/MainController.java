@@ -72,7 +72,7 @@ public class MainController {
             case 1 -> restaurantView.list();                                  // F-05
             case 2 -> System.out.println("[TODO:C] ReviewView.detail()");     // F-08
             case 3 -> restaurantView.add();                                   // F-04
-            case 4 -> System.out.println("[TODO:B] RestaurantView.manage()"); // F-06
+            case 4 -> restaurantView.manage();                                // F-06
             case 0 -> { }
             default -> System.out.println("잘못된 선택입니다.");
         }
