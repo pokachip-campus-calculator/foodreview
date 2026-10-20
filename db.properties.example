@@ -1,0 +1,3 @@
+db.url=jdbc:mysql://localhost:3306/foodreview?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+db.user=
+db.password=

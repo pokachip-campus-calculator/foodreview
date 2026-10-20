@@ -1,0 +1,1 @@
+-- CREATE TABLE (STEP 3에서 작성)
