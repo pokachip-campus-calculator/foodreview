@@ -14,4 +14,9 @@ public class ReviewInputView {
         review.setContent(ConsoleInput.readLine("리뷰 내용"));
         return review;
     }
+
+    /** 조회할 가게 번호 입력. 숫자가 아니면 ConsoleInput 이 다시 묻는다. */
+    public int readRestaurantId() {
+        return ConsoleInput.readInt("가게 번호");
+    }
 }

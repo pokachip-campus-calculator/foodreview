@@ -69,7 +69,7 @@ public class MainController {
         System.out.println("0. 뒤로");
         switch (ConsoleInput.readInt("선택")) {
             case 1 -> System.out.println("[TODO:B] RestaurantView.list()");   // F-05
-            case 2 -> System.out.println("[TODO:C] ReviewView.detail()");     // F-08
+            case 2 -> reviewController.detail();                              // F-08
             case 3 -> System.out.println("[TODO:B] RestaurantView.add()");    // F-04
             case 4 -> System.out.println("[TODO:B] RestaurantView.manage()"); // F-06
             case 0 -> { }
