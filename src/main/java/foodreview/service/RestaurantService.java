@@ -4,6 +4,7 @@ import foodreview.dao.RestaurantDAO;
 import foodreview.dto.RestaurantDTO;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /** 맛집 업무 규칙. 입력 검증을 하고 DAO 를 호출한다. */
 public class RestaurantService {
@@ -29,6 +30,11 @@ public class RestaurantService {
         restaurant.setRegion(region.trim());
         restaurant.setCategory(category.trim());
         restaurantDAO.insert(restaurant);
+    }
+
+    /** 맛집 목록 조회 (F-05). 등록순. */
+    public List<RestaurantDTO> getRestaurantList() throws SQLException {
+        return restaurantDAO.findAll();
     }
 
     private boolean isBlank(String value) {
