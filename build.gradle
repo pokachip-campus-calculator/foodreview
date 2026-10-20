@@ -21,9 +21,14 @@ application {
     mainClass = 'foodreview.Main'
 }
 
-// 콘솔 입력을 받기 위해 필요
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+// 콘솔 입력을 받기 위해 필요. 한글이 깨지지 않도록 UTF-8 로 맞춘다
 run {
     standardInput = System.in
+    jvmArgs = ['-Dfile.encoding=UTF-8', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8']
 }
 
 test {
