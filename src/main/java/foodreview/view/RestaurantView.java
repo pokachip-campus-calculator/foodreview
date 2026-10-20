@@ -42,12 +42,63 @@ public class RestaurantView {
                 System.out.println("등록된 맛집이 없습니다");
                 return;
             }
-            for (RestaurantDTO restaurant : restaurantList) {
-                System.out.println(restaurant.getRestaurantId() + ". " + restaurant.getName()
-                        + " | " + restaurant.getCategory() + " | " + orDash(restaurant.getRegion()));
-            }
+            printRestaurants(restaurantList);
         } catch (SQLException e) {
             System.out.println("DB 오류가 발생했습니다");
+        }
+    }
+
+    /** 내 맛집 수정 / 삭제 (F-06) */
+    public void manage() {
+        System.out.println("\n--- 내 맛집 수정 / 삭제 ---");
+        int memberId = LoginSession.getMemberId();
+
+        try {
+            List<RestaurantDTO> myList = restaurantService.getMyRestaurantList(memberId);
+            if (myList.isEmpty()) {
+                System.out.println("등록한 맛집이 없습니다");
+                return;
+            }
+            printRestaurants(myList);
+
+            int restaurantId = ConsoleInput.readInt("맛집 번호");
+            restaurantService.checkMine(memberId, restaurantId);
+            System.out.println("1. 수정  2. 삭제  0. 취소");
+            switch (ConsoleInput.readInt("선택")) {
+                case 1 -> update(memberId, restaurantId);
+                case 2 -> delete(memberId, restaurantId);
+                default -> System.out.println("취소되었습니다");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("DB 오류가 발생했습니다");
+        }
+    }
+
+    private void update(int memberId, int restaurantId) throws SQLException {
+        String name = ConsoleInput.readLine("새 가게 이름");
+        String address = ConsoleInput.readLine("새 주소");
+        String region = ConsoleInput.readLine("새 지역");
+        String category = selectCategory();
+
+        restaurantService.updateMine(memberId, restaurantId, name, address, region, category);
+        System.out.println("수정 완료");
+    }
+
+    private void delete(int memberId, int restaurantId) throws SQLException {
+        if (!ConsoleInput.confirm("리뷰도 함께 삭제됩니다. 정말 삭제할까요?")) {
+            System.out.println("취소되었습니다");
+            return;
+        }
+        restaurantService.deleteMine(memberId, restaurantId);
+        System.out.println("삭제 완료");
+    }
+
+    private void printRestaurants(List<RestaurantDTO> restaurantList) {
+        for (RestaurantDTO restaurant : restaurantList) {
+            System.out.println(restaurant.getRestaurantId() + ". " + restaurant.getName()
+                    + " | " + restaurant.getCategory() + " | " + orDash(restaurant.getRegion()));
         }
     }
 
