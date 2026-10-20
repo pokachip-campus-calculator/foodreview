@@ -1,6 +1,7 @@
 package foodreview.view;
 
 import foodreview.dao.MemberDAO;
+import foodreview.dto.MemberDTO;
 import foodreview.util.ConsoleInput;
 import foodreview.util.LoginSession;
 
@@ -51,15 +52,89 @@ public class MemberView {
         String password = ConsoleInput.readLine("비밀번호");
 
         try {
-            MemberDAO.LoginResult member = dao.login(loginId, password);
+            MemberDTO member = dao.login(loginId, password);
             if (member == null) {
                 System.out.println("아이디 또는 비밀번호가 올바르지 않습니다.");
                 return;
             }
-            LoginSession.login(member.memberId(), member.nickname());
-            System.out.println(member.nickname() + " 님, 환영합니다.");
+            LoginSession.login(member.getMemberId(), member.getNickname());
+            System.out.println(member.getNickname() + " 님, 환영합니다.");
         } catch (SQLException e) {
             System.out.println("DB 오류가 발생했습니다.");
         }
+    }
+
+    /** F-03 내 정보 수정 / 탈퇴 */
+    public void myPage() {
+        System.out.println("\n--- 내 정보 (" + LoginSession.getNickname() + " 님) ---");
+        System.out.println("1. 닉네임 변경");
+        System.out.println("2. 비밀번호 변경");
+        System.out.println("3. 회원 탈퇴");
+        System.out.println("0. 뒤로");
+        try {
+            switch (ConsoleInput.readInt("선택")) {
+                case 1 -> changeNickname();
+                case 2 -> changePassword();
+                case 3 -> withdraw();
+                case 0 -> { }
+                default -> System.out.println("잘못된 선택입니다.");
+            }
+        } catch (SQLException e) {
+            System.out.println("DB 오류가 발생했습니다.");
+        }
+    }
+
+    private void changeNickname() throws SQLException {
+        String nickname = ConsoleInput.readLine("새 닉네임");
+        if (nickname.isEmpty()) {
+            System.out.println("입력값을 확인해 주세요.");
+            return;
+        }
+        if (nickname.equals(LoginSession.getNickname())) {
+            System.out.println("현재 닉네임과 같습니다.");
+            return;
+        }
+        if (dao.existsNickname(nickname)) {
+            System.out.println("이미 사용 중인 닉네임입니다.");
+            return;
+        }
+        dao.updateNickname(LoginSession.getMemberId(), nickname);
+        LoginSession.updateNickname(nickname);
+        System.out.println("닉네임이 변경되었습니다.");
+    }
+
+    private void changePassword() throws SQLException {
+        if (!checkPassword()) {
+            return;
+        }
+        String password = ConsoleInput.readLine("새 비밀번호");
+        if (password.isEmpty()) {
+            System.out.println("입력값을 확인해 주세요.");
+            return;
+        }
+        dao.updatePassword(LoginSession.getMemberId(), password);
+        System.out.println("비밀번호가 변경되었습니다.");
+    }
+
+    private void withdraw() throws SQLException {
+        if (!checkPassword()) {
+            return;
+        }
+        if (!ConsoleInput.confirm("정말 탈퇴하시겠습니까? 되돌릴 수 없습니다.")) {
+            System.out.println("탈퇴를 취소했습니다.");
+            return;
+        }
+        dao.withdraw(LoginSession.getMemberId());
+        LoginSession.logout();
+        System.out.println("탈퇴 처리되었습니다.");
+    }
+
+    /** 본인 확인. 비밀번호가 다르면 false. */
+    private boolean checkPassword() throws SQLException {
+        if (dao.matchesPassword(LoginSession.getMemberId(), ConsoleInput.readLine("현재 비밀번호"))) {
+            return true;
+        }
+        System.out.println("비밀번호가 일치하지 않습니다.");
+        return false;
     }
 }
