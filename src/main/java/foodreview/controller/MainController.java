@@ -2,12 +2,15 @@ package foodreview.controller;
 
 import foodreview.util.ConsoleInput;
 import foodreview.util.LoginSession;
+import foodreview.view.MemberView;
 
 /**
  * 콘솔 메뉴를 출력하고 각 담당자의 View 로 넘긴다. (기획서 6. 콘솔 메뉴 구조)
  * 담당자는 자기 기능의 [TODO] 줄만 자기 View 호출로 바꾼다.
  */
 public class MainController {
+
+    private final MemberView memberView = new MemberView();
 
     /** 로그인 상태에 따라 메뉴를 분기한다. false 면 프로그램 종료. */
     public boolean run() {
@@ -21,7 +24,7 @@ public class MainController {
         System.out.println("2. 로그인");
         System.out.println("0. 종료");
         switch (ConsoleInput.readInt("선택")) {
-            case 1 -> System.out.println("[TODO:A] MemberView.join()");       // F-01
+            case 1 -> memberView.join();                                      // F-01
             case 2 -> System.out.println("[TODO:A] MemberView.login()");      // F-02
             case 0 -> {
                 System.out.println("프로그램을 종료합니다.");
