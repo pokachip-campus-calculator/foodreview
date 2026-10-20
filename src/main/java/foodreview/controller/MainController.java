@@ -9,6 +9,8 @@ import foodreview.util.LoginSession;
  */
 public class MainController {
 
+    private final ReviewController reviewController = new ReviewController();
+
     /** 로그인 상태에 따라 메뉴를 분기한다. false 면 프로그램 종료. */
     public boolean run() {
         return LoginSession.isLoggedIn() ? mainMenu() : guestMenu();
@@ -82,7 +84,7 @@ public class MainController {
         System.out.println("2. 내 리뷰 수정 / 삭제");
         System.out.println("0. 뒤로");
         switch (ConsoleInput.readInt("선택")) {
-            case 1 -> System.out.println("[TODO:C] ReviewView.write()");      // F-07
+            case 1 -> reviewController.write();                               // F-07
             case 2 -> System.out.println("[TODO:C] ReviewView.manage()");     // F-09
             case 0 -> { }
             default -> System.out.println("잘못된 선택입니다.");
