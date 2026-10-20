@@ -2,6 +2,7 @@ package foodreview.view;
 
 import foodreview.dao.MemberDAO;
 import foodreview.util.ConsoleInput;
+import foodreview.util.LoginSession;
 
 import java.sql.SQLException;
 
@@ -40,6 +41,25 @@ public class MemberView {
             } else {
                 System.out.println("DB 오류가 발생했습니다.");
             }
+        }
+    }
+
+    /** F-02 로그인 */
+    public void login() {
+        System.out.println("\n--- 로그인 ---");
+        String loginId = ConsoleInput.readLine("아이디");
+        String password = ConsoleInput.readLine("비밀번호");
+
+        try {
+            MemberDAO.LoginResult member = dao.login(loginId, password);
+            if (member == null) {
+                System.out.println("아이디 또는 비밀번호가 올바르지 않습니다.");
+                return;
+            }
+            LoginSession.login(member.memberId(), member.nickname());
+            System.out.println(member.nickname() + " 님, 환영합니다.");
+        } catch (SQLException e) {
+            System.out.println("DB 오류가 발생했습니다.");
         }
     }
 }

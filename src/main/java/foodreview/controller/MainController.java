@@ -25,7 +25,7 @@ public class MainController {
         System.out.println("0. 종료");
         switch (ConsoleInput.readInt("선택")) {
             case 1 -> memberView.join();                                      // F-01
-            case 2 -> System.out.println("[TODO:A] MemberView.login()");      // F-02
+            case 2 -> memberView.login();                                     // F-02
             case 0 -> {
                 System.out.println("프로그램을 종료합니다.");
                 return false;
