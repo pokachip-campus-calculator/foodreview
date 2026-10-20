@@ -46,7 +46,7 @@ public class MainController {
         switch (ConsoleInput.readInt("선택")) {
             case 1 -> restaurantMenu();
             case 2 -> reviewMenu();
-            case 3 -> System.out.println("[TODO:A] MemberView.myPage()");     // F-03
+            case 3 -> memberView.myPage();                                    // F-03
             case 4 -> {
                 LoginSession.logout();
                 System.out.println("로그아웃되었습니다.");

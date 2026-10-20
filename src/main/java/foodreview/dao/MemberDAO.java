@@ -1,5 +1,6 @@
 package foodreview.dao;
 
+import foodreview.dto.MemberDTO;
 import foodreview.util.DBUtil;
 
 import java.sql.Connection;
@@ -26,22 +27,68 @@ public class MemberDAO {
     }
 
     /** 로그인 성공 시 회원 정보, 실패하면 null. 탈퇴한 회원은 로그인할 수 없다. (F-02) */
-    public LoginResult login(String loginId, String password) throws SQLException {
-        String sql = "SELECT member_id, nickname FROM member"
+    public MemberDTO login(String loginId, String password) throws SQLException {
+        String sql = "SELECT member_id, login_id, nickname, created_at FROM member"
                 + " WHERE login_id = ? AND password_hash = ? AND withdrawn_at IS NULL";
         try (Connection con = DBUtil.getConnection();
              PreparedStatement pstmt = con.prepareStatement(sql)) {
             pstmt.setString(1, loginId);
             pstmt.setString(2, password);
             try (ResultSet rs = pstmt.executeQuery()) {
-                return rs.next()
-                        ? new LoginResult(rs.getInt("member_id"), rs.getString("nickname"))
-                        : null;
+                if (!rs.next()) {
+                    return null;
+                }
+                MemberDTO member = new MemberDTO();
+                member.setMemberId(rs.getInt("member_id"));
+                member.setLoginId(rs.getString("login_id"));
+                member.setNickname(rs.getString("nickname"));
+                member.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                return member;
             }
         }
     }
 
-    public record LoginResult(int memberId, String nickname) { }
+    /** 닉네임 변경. (F-03) */
+    public void updateNickname(int memberId, String nickname) throws SQLException {
+        update("UPDATE member SET nickname = ? WHERE member_id = ?", nickname, memberId);
+    }
+
+    /** 비밀번호 변경. (F-03) */
+    public void updatePassword(int memberId, String password) throws SQLException {
+        update("UPDATE member SET password_hash = ? WHERE member_id = ?", password, memberId);
+    }
+
+    /** 현재 비밀번호 확인. 비밀번호 변경·탈퇴 전에 본인인지 묻는다. (F-03) */
+    public boolean matchesPassword(int memberId, String password) throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(
+                     "SELECT 1 FROM member WHERE member_id = ? AND password_hash = ?")) {
+            pstmt.setInt(1, memberId);
+            pstmt.setString(2, password);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    /** 탈퇴. 등록한 맛집·리뷰가 FK 로 묶여 있어 행을 지우지 않고 탈퇴 시각만 남긴다. (F-03) */
+    public void withdraw(int memberId) throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(
+                     "UPDATE member SET withdrawn_at = NOW() WHERE member_id = ?")) {
+            pstmt.setInt(1, memberId);
+            pstmt.executeUpdate();
+        }
+    }
+
+    private void update(String sql, String value, int memberId) throws SQLException {
+        try (Connection con = DBUtil.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, value);
+            pstmt.setInt(2, memberId);
+            pstmt.executeUpdate();
+        }
+    }
 
     public boolean existsLoginId(String loginId) throws SQLException {
         return exists("SELECT 1 FROM member WHERE login_id = ?", loginId);
