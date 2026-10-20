@@ -2,6 +2,7 @@ package foodreview.controller;
 
 import foodreview.util.ConsoleInput;
 import foodreview.util.LoginSession;
+import foodreview.view.RestaurantView;
 import foodreview.view.MemberView;
 
 /**
@@ -61,6 +62,8 @@ public class MainController {
         return true;
     }
 
+    private final RestaurantView restaurantView = new RestaurantView();
+
     /** 1. 맛집 관리 */
     private void restaurantMenu() {
         System.out.println("\n--- 맛집 관리 ---");
@@ -72,7 +75,7 @@ public class MainController {
         switch (ConsoleInput.readInt("선택")) {
             case 1 -> System.out.println("[TODO:B] RestaurantView.list()");   // F-05
             case 2 -> System.out.println("[TODO:C] ReviewView.detail()");     // F-08
-            case 3 -> System.out.println("[TODO:B] RestaurantView.add()");    // F-04
+            case 3 -> restaurantView.add();                                   // F-04
             case 4 -> System.out.println("[TODO:B] RestaurantView.manage()"); // F-06
             case 0 -> { }
             default -> System.out.println("잘못된 선택입니다.");
