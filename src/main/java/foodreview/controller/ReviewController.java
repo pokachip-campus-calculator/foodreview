@@ -14,6 +14,12 @@ public class ReviewController {
     private final ReviewInputView inputView = new ReviewInputView();
     private final ReviewOutputView outputView = new ReviewOutputView();
 
+    /** F-08 맛집 상세 조회 */
+    public void detail() {
+        int restaurantId = inputView.readRestaurantId();
+        outputView.printDetail(reviewService.getDetail(restaurantId));
+    }
+
     /** F-07 리뷰 작성 */
     public void write() {
         ReviewDTO review = inputView.readNewReview();
