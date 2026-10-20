@@ -90,7 +90,7 @@ public class MainController {
         System.out.println("0. 뒤로");
         switch (ConsoleInput.readInt("선택")) {
             case 1 -> reviewController.write();                               // F-07
-            case 2 -> System.out.println("[TODO:C] ReviewView.manage()");     // F-09
+            case 2 -> reviewController.manage();                              // F-09
             case 0 -> { }
             default -> System.out.println("잘못된 선택입니다.");
         }
